@@ -1,0 +1,32 @@
+foundation:
+  name: 
+  docker_registry: 
+  smtp_host: 
+  director: 
+
+pipelines:
+  healthcheck_git: 
+  email-from: 
+  email-to: 
+  healthcheck:
+    git: https://github.com/theautoroboto/pcf-healthcheck.git
+    start:
+    stop:
+    check_interval:
+
+secrets:
+  bosh_admin:
+    username:
+    password:
+  docker:
+    username:
+    password:
+  concourse:
+    git:
+      username: 
+      password: 
+
+certs:
+  PCF_CERT: |
+    -----BEGIN CERTIFICATE-----
+    -----END CERTIFICATE-----

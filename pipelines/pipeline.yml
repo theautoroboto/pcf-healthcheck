@@ -1,0 +1,70 @@
+resources:
+- name: pcf-health-check
+  type: git
+  source:
+    uri: ((pipelines.healthcheck.git))
+    username: ((secrets.concourse.git.username))
+    password: ((secrets.concourse.git.password))
+    skip_ssl_verification: true
+
+- name: schedule
+  type: time
+  source:
+    start: ((pipelines.healthcheck.start))
+    stop: ((pipelines.healthcheck.stop))
+    location: America/New_York
+    interval: ((pipelines.healthcheck.check_interval))
+- name: send-an-email
+  type: email
+  source:
+    smtp:
+      host: ((foundation.smtp_host))
+      port: "25"
+      skip_ssl_validation: true
+      anonymous: true
+    from: ((pipelines.email-from))
+    to: [ ((pipelines.email-to)) ]
+
+- name: pipeline_image
+  type: docker-image
+  source:
+    insecure_registries:
+    - ((foundation.docker_registry))
+    repository: ((foundation.docker_registry))/pcf-admins/clitools
+    username: ((secrets.docker.username))
+    password: ((secrets.docker.password))
+
+resource_types:
+- name: email
+  type: docker-image
+  source:
+    insecure_registries:
+    - ((foundation.docker_registry))
+    repository: pcfseceng/email-resource
+    tag: latest
+    username: ((secrets.docker.username))
+    password: ((secrets.docker.password))
+
+jobs:
+- name: scheduled-smoketests
+  plan:
+  - get: schedule
+    trigger: ((trigger-schedule))
+  - get: pcf-health-check
+  - get: pipeline_image
+  - task: run-smoke-tests
+    image: pipeline_image
+    file: pcf-health-check/tasks/task.yml
+    params:
+      BOSH_ADMIN_CLIENT: ((secrets.bosh_admin.username))
+      PCF_SCRT: ((secrets.bosh_admin.password))
+      PCF_URL: ((foundation.director))
+      PCF_CERT: ((certs.PCF_CERT))
+      VERBOSE_TEST: ((VERBOSE_TEST))
+      PCF_ENV: ((foundation.name))
+  on_failure:
+    put: send-an-email
+    params:
+      headers: email/smoketestheaders.txt
+      subject: email/smoketestsubject.txt
+      body: email/smoketest.html
