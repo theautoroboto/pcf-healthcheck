@@ -5,7 +5,6 @@ foundation:
   director: 
 
 pipelines:
-  healthcheck_git: 
   email-from: 
   email-to: 
   healthcheck:
