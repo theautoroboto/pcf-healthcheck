@@ -13,7 +13,7 @@ resources:
     start: ((pipelines.healthcheck.start))
     stop: ((pipelines.healthcheck.stop))
     location: America/New_York
-    interval: ((pipelines.healthcheck.check_interval))
+    interval: ((pipelines.healthcheck.run_interval))
 - name: send-an-email
   type: email
   source:

@@ -11,7 +11,7 @@ pipelines:
     git: https://github.com/theautoroboto/pcf-healthcheck.git
     start:
     stop:
-    check_interval:
+    run_interval:
 
 secrets:
   bosh_admin:
