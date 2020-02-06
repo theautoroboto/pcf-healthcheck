@@ -19,4 +19,4 @@ params:
   PCF_ENV:
 
 run:
-  path: pcf-health-check/tasks/health-check/task.sh
+  path: pcf-health-check/tasks/task.sh
